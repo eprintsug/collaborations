@@ -1,0 +1,553 @@
+#!/usr/bin/perl -w -I/usr/local/eprints/perl_lib
+
+######################################################################
+#
+# Generate author collabaration network graphs.
+#
+# This script creates XML files that describe the collabarations 
+# between authors. The collaborations are saved as a graph.
+# The graph can then be visualised or further be analysed.
+#
+######################################################################
+#
+#  Copyright 2016 University of Zurich. All Rights Reserved.
+#
+#  Martin Brändle
+#  Zentrale Informatik
+#  Universität Zürich
+#  Stampfenbachstr. 73
+#  CH-8006 Zürich
+#
+#  The plug-ins are free software; you can redistribute them and/or modify
+#  them under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  The plug-ins are distributed in the hope that they will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with EPrints 3; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+#
+######################################################################
+
+=pod
+
+=for Pod2Wiki
+
+=head1 NAME
+
+B<generate_collaborations> - Generate author-coauthor collaboration data for an EPrint repository
+
+=head1 SYNOPSIS
+
+B<generate_collaborations> I<repository_id> [B<options>] [I<eprint_id> I<eprint_id> ...]
+
+=head1 DESCRIPTION
+
+This script creates XML files that describe the collaborations between authors 
+in a repository as graph consisting of nodes (author names) and edges 
+(author-coauthor relation). The graph can then be visualised or further be analysed. 
+If the --update, --new, and --author options are not specified, the complete 
+live archive is processed.
+The fields to be used for the author data can be defined in the configuration,
+e.g. cfg.d/z_collaborations.pl: 
+
+$c->{collaboration_fields} = [
+  'creators_abbrv',
+  'editors_abbrv'
+]; 
+
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item B<repository_id> 
+
+The ID of the eprint repository to use.
+
+=item B<eprintid> 
+
+Create the author collaboration data for one or several eprintids.
+
+
+=back
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--log LOGFILE>
+
+Log output to LOGFILE. If there is no log file, messages will be written to
+standard output.
+
+=item B<--update>
+
+Calculates author collaboration data for a slice of eprints (out of the total eprints) for 
+today, including the eprints that were added yesterday.
+
+=item B<--new>
+
+Calculates author collaboration data for the eprints that were added yesterday.
+
+=item B<--author> I<author_name>
+
+Calculates author collaboration data for author_name. 
+The author name must be enclosed in double quotes and be in the same format 
+as the fields that are used to create the author collaborations.
+Family name and given name should be separated by a comma.
+
+=item B<--save>
+
+Saves the list of author names and eprint counts into coauthor_data/author_list.xml
+
+=item B<--help>
+
+Print a brief help message and exit.
+
+=item B<--man>
+
+Print the full manual page and then exit.
+
+=item B<--quiet>
+
+Be vewwy vewwy quiet. This option will supress all output unless an error occurs.
+
+=item B<--verbose>
+
+Explain in detail what is going on. May be repeated for greater effect.
+
+=item B<--version>
+
+Output version information and exit.
+
+=back   
+
+=cut
+
+use strict;
+use warnings;
+
+use EPrints;
+use EPrints::LogHandler;
+use Data::Dumper;
+
+use Getopt::Long;
+use Pod::Usage;
+use utf8;
+
+my $update = 0;
+my $update_new = 0;
+my $author = undef;
+my $save = 0;
+my $logfile = undef;
+my $version = 0;
+my $verbose = 0;
+my $quiet = 0;
+my $help = 0;
+my $man = 0;
+
+
+Getopt::Long::Configure("permute");
+
+GetOptions(
+	'update' => \$update,
+	'new' => \$update_new,
+	'author=s' => \$author,
+	'save' => \$save,
+	'log=s' => \$logfile,
+	'help|?' => \$help,
+	'man' => \$man,
+	'version' => \$version,
+	'verbose+' => \$verbose,
+	'silent' => \$quiet,
+	'quiet' => \$quiet,
+) || pod2usage( 2 );
+
+EPrints::Utils::cmd_version( "generate_coauthor_relations" ) if $version;
+pod2usage( 1 ) if $help;
+pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+pod2usage( 2 ) if( scalar @ARGV < 1 ); 
+
+my $noise = 1;
+$noise = 0 if( $quiet );
+$noise = 1+$verbose if( $verbose );
+
+binmode( STDOUT, ":encoding(UTF-8)" );
+
+#
+# If we are logging to a file, set the "stderr" flag of the log handler so that
+# errors also go to STDERR. Otherwise, just send them to standard output.
+#
+my $stderr = 0;
+if ( defined $logfile )
+{
+	$stderr = 1;
+}
+
+my $repoid = $ARGV[0];
+
+my $session = EPrints::Session->new( 1 , $repoid , $noise );
+if( !defined $session )
+{
+	print STDERR "Failed to load repository: $repoid\n";
+	exit 1;
+}
+
+#
+# Open a logfile handler
+#
+my $handler = EPrints::LogHandler->new(
+	session => $session,
+	logfile => $logfile,
+	prefix => "$repoid",
+	stderr => $stderr,
+);
+if ( !defined( $handler  ) )
+{
+	print STDERR "Could not open $logfile: $!";
+	$session->terminate();
+	exit 1;
+}
+
+#
+# Create a plugin  
+#
+my $plugin;
+$plugin = $session->plugin( 
+	'Collaborations::Processor',
+	Handler => $handler
+);
+
+if ( !defined($plugin) )
+{
+	# the plug-in itself should print an error message
+	$session->terminate();
+	exit 1;
+}
+
+#
+# Prepare the plugin parameters
+#
+$plugin->{param}->{author} = $author;
+$plugin->{param}->{save} = $save;
+$plugin->{param}->{verbose} = $verbose;
+
+my $repository = $session->get_repository;
+my $dataset = $repository->get_dataset( "archive" );
+
+
+$plugin->{session} = $session;
+$plugin->{repository} = $repository;
+$plugin->{dataset} = $dataset;
+$plugin->{author_fields} = $repository->config( "collaboration_fields" );
+
+#
+# Author list
+#
+$plugin->{full_author_list} = {};
+$plugin->{author_list} = {};
+
+#
+# Preparation
+#
+create_dirs( $session );
+
+# To avoid processing of too large arrays, we need to go in 4 passes
+# 1. Get an list of unique author names and determine their count of eprints
+# 2. Assign ids to author names
+# 3. Prepare the list of authors to be processed
+# 4. For each author, determine its associated eprints and coauthors
+
+#
+# Pass 1 - Get list of unique author names and determine their count of eprints
+#
+$plugin->create_full_author_list();
+
+#
+# Pass 2 - Assign ids to author names
+#
+$plugin->assign_author_ids();
+
+#
+# Save full author list
+#
+$plugin->save_author_list() if ($save);
+
+#
+# Pass 3 - Prepare the list of authors to be processed. May be done in different ways:
+#          - for a single given author
+#          - for a set of eprint ids
+#          - for all eprints
+#
+if ( defined $author )
+{
+	# single author
+	$plugin->get_single_author( $author );
+}
+else
+{
+	# for a set of eprints  (either specific eprint ids or new / updated eprints)
+	my $eplist;
+	
+	if ( scalar(@ARGV) > 1 )
+	{
+		# for specific eprintids in the live archive
+		my $plist = "";
+		
+		for (my $i = 0; $i < scalar(@ARGV); $i++)
+		{
+			$plist = $plist . $ARGV[$i] . " ";
+		}
+	
+		$plist = substr($plist,0,-1) if (length($plist) > 0);
+		
+		my $epexp = EPrints::Search->new(
+	   		session => $session,
+	   		dataset => $dataset,
+	   		order => "eprintid",
+	   	);
+	   	
+	   	$epexp->add_field(
+	   		$dataset->get_field("eprintid"),
+	   		$plist,
+	   		"EQ",
+	   		"ANY",
+	   	);
+	   	
+	   	$eplist = $epexp->perform_search;
+	   	
+	   	$eplist->map( \&process_record, $plugin );
+	}
+	elsif ($update || $update_new)
+	{
+		#
+		# Work out the date for which we are doing the update
+		#
+		my ( $update_year, $update_month, $update_day, $update_hour, $update_minute, $update_second ) = Date::Calc::Today_and_Now();
+	
+		#
+		# Convert the update date to GMT since EPrints functions return GMT
+		#
+		my ( $delta_year, $delta_month, $delta_day, $delta_hour, $delta_minute, $delta_second, $dst ) = Date::Calc::Timezone();
+		
+		( $update_year, $update_month, $update_day, $update_hour, $update_minute, $update_second ) = Date::Calc::Add_Delta_YMDHMS(
+			$update_year, $update_month, $update_day, $update_hour, $update_minute, $update_second,
+			-$delta_year, -$delta_month, -$delta_day, -$delta_hour, -$delta_minute, -$delta_second,
+		);
+		
+		my @ids;
+		if ($update)
+		{
+			@ids = get_eprintids_for_day( $session, $dataset, $update_year, $update_month, $update_day );
+		}
+	
+		# save the last index of the array for later
+		my $cutoff = ( scalar @ids ) - 1;
+	
+		# add the IDs of all the eprints deposited yesterday
+		my @ids_extra = get_eprintids_for_yesterday( $session, $dataset, $update_year, $update_month, $update_day );
+		if ( scalar @ids_extra > 0 )
+		{
+			push @ids, @ids_extra;
+		}
+			
+		# output eprint IDs 
+		if ( $noise > 0 )
+		{
+			print "Running update for " . Date::Calc::Date_to_Text( $update_year, $update_month, $update_day ) . " UTC.\n";
+			if ( scalar @ids > 0 )
+			{
+				print "Scheduled EPrints: " . $ids[0] . " to " . $ids[$cutoff] . "\n" if $update;
+				if ( scalar @ids > $cutoff + 1 )
+				{
+					print "New EPrints:";
+					for ( my $i = $cutoff + 1; $i < scalar @ids; $i++ )
+					{
+						print " ". $ids[$i];
+					}
+					print "\n";
+				}
+			}
+			else
+			{
+				print "No EPrints scheduled.\n";
+			}
+		}
+		
+		# create a list from the IDs
+		$eplist = EPrints::List->new( 
+			repository => $session->get_repository, 
+			dataset => $dataset,
+			ids => \@ids
+		);
+		
+		$eplist->map( \&process_record, $plugin );
+		
+	}
+	else
+	{
+		# all eprints
+		$plugin->{author_list} = $plugin->{full_author_list}
+	}
+}
+
+#
+# Pass 4 - For each author, determine its associated eprints and coauthors
+#
+# check whether there are authors to process
+if (scalar keys %{$plugin->{author_list}} > 0)
+{
+	$plugin->create_coauthor_graphs();
+}
+
+$session->terminate();
+exit;
+
+
+sub process_record
+{
+	my ($session, $dataset, $eprint, $plugin ) = @_;
+		
+	$plugin->get_author_list( $eprint );
+	
+	return;
+}
+
+#
+# Get an array of eprint IDs that are due for updates today
+#
+sub get_eprintids_for_day
+{
+	my ( $session, $dataset, $year, $month, $day ) = @_;
+
+	# get all of the eprints to the end of the previous month
+	my $list = get_eprints_before_month( $session, $dataset, $year, $month);
+
+	# work which eprints are due for update today
+	my $n = $list->count;
+	my $d = Date::Calc::Days_in_Month( $year, $month );
+	my $index_start = ( ( $day - 1 ) * $n ) / $d;
+	my $index_end = ( $day * $n ) / $d - 1;
+	my $index_count = ( $index_end >= $index_start )? $index_end - $index_start + 1 : 1;
+	my @ids = @{$list->ids( $index_start, $index_count )};
+
+	# clean up
+	$list->dispose;
+
+	return @ids;
+}
+
+#
+# Get an array of eprint IDs that were deposited yesterday
+#
+sub get_eprintids_for_yesterday
+{
+	my ( $session, $dataset, $year, $month, $day ) = @_;
+
+	# get yesterday's date
+	my ( $yesterday_year, $yesterday_month, $yesterday_day ) = Date::Calc::Add_Delta_Days( $year, $month, $day, -1 );
+
+	# find all of the eprints added yesterday
+	my $searchexp = get_basic_searchexp( $session, $dataset );
+	
+	$searchexp->add_field( 
+		$dataset->get_field( "datestamp" ), 
+		sprintf( "%04d-%02d-%02d", $yesterday_year, $yesterday_month, $yesterday_day )
+	);
+	
+	my $list = $searchexp->perform_search;
+	my @ids = @{$list->ids};
+
+	# clean up
+	$list->dispose;
+
+	return @ids;
+}
+
+#
+# Get a list of all eprints that existed at the beginning of the month.
+#
+sub get_eprints_before_month
+{
+	my ( $session, $dataset, $year, $month ) = @_;
+
+	# work out the last day of the previous month
+	my $last_month = $month - 1;
+	my $last_year = $year;
+	if ( $last_month == 0)
+	{
+		$last_year--;
+		$last_month = 12;
+	}
+	my $last_day = Date::Calc::Days_in_Month( $last_year, $last_month );
+
+	# get the eprints
+	my $searchexp = get_basic_searchexp( $session, $dataset );
+
+	$searchexp->add_field( 
+		$dataset->get_field( "datestamp" ), 
+		sprintf( "-%04d-%02d-%02d", $last_year, $last_month, $last_day )
+	);
+	
+	return $searchexp->perform_search;
+}
+
+#
+# Creates the standard search expression. If required, slices for specific datestamps
+# are added later in get_eprintids_for_yesterday, get_eprints_before_month,
+#
+sub get_basic_searchexp
+{
+	my ( $session, $dataset ) = @_;
+
+	my $searchexp = EPrints::Search->new(
+		session => $session,
+		dataset => $dataset,
+		custom_order => "eprintid",
+	);
+	
+	return $searchexp;
+}
+
+
+sub create_dirs
+{
+	my ( $session ) = @_;
+	
+	my $dir =  $session->get_repository->get_conf( "htdocs_path" )."/coauthor_data";
+	EPrints::Platform::mkdir( $dir );
+	
+    foreach my $langid ( @{$session->get_repository->get_conf( "languages" )} )
+	{
+        $session->change_lang( $langid );
+		my $dir =  $session->get_repository->get_conf( "htdocs_path" )."/".$langid."/coauthors";
+		
+		EPrints::Platform::mkdir( $dir );
+	}
+	
+	return;
+}
+
+
+
+=head1 COPYRIGHT
+
+=for COPYRIGHT BEGIN
+
+Copyright 2016 University of Zurich.
+
+=for COPYRIGHT END
+
+=for LICENSE BEGIN
+
+You should have received a copy of the GNU General Public License
+along with EPrints.  If not, see L<http://www.gnu.org/licenses/>.
+
+=for LICENSE END
+

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE phrases SYSTEM "entities.dtd">
+
+<epp:phrases xmlns="http://www.w3.org/1999/xhtml" xmlns:epp="http://eprints.org/ep3/phrase" xmlns:epc="http://eprints.org/ep3/control">
+
+  <epp:phrase id="Plugin/Screen/Collaborations/View:title">Author Collaborations</epp:phrase>
+  <epp:phrase id="Plugin/Screen/Collaborations/View:missing_author">The author name is missing. The CGI URL must be extended by the parameter author=author_name.</epp:phrase>
+  <epp:phrase id="Plugin/Screen/Collaborations/View:missing_authordata">No collaboration data is available for author <epc:pin name="author" />. The XML file with the data usually is created next night after the document has been moved to the live archive.</epp:phrase>
+  <epp:phrase id="Plugin/Screen/Collaborations/View:no_canvas_support">Your browser does not support the canvas tag.</epp:phrase>
+
+  <epp:phrase id="Plugin/Screen/Collaborations/View:page_template">
+    <div id="cw_body" class="panel-body">
+      <!--[if lt IE 9]>
+               <script type="text/javascript">alert("Your browser does not support the canvas tag.");</script>
+      <![endif]-->
+      <script type="text/javascript">
+        // convenience function to get the id attribute of generated sketch html element
+        function getProcessingSketchId () { return 'ConWheel'; }
+      </script>
+      <div class="panel panel-default panel-uzh-fp">
+        <div class="panel-heading">
+          <h3 class="panel-title"><a href="#">Coauthors of <epc:pin name="author_name"/></a>
+            <span class="ep_only_js ep_only_js_collaborations">
+              <div class="ep_sr_show_help ep_toggle" id="collaborations_help_show">
+                <a onclick="EPJS_blur(event); EPJS_toggleSlide('collaborations_help',false);EPJS_toggle('collaborations_help_hide',false);EPJS_toggle('collaborations_help_show',true);return false" href="#">
+                  <span class="glyphicon glyphicon-question-sign collaborations_glyphicon" />
+                </a>
+              </div>
+              <div class="ep_sr_hide_help ep_toggle ep_hide" id="collaborations_help_hide">
+                <a onclick="EPJS_blur(event); EPJS_toggleSlide('collaborations_help',false);EPJS_toggle('collaborations_help_hide',false);EPJS_toggle('collaborations_help_show',true);return false" href="#">
+                  <span class="glyphicon glyphicon-minus-sign collaborations_glyphicon" />
+                </a>
+              </div>
+            </span>
+          </h3>
+        </div>
+        <epc:pin name="help" />
+        <div id="content_cw" style="margin: 0px auto 0px auto; width: 400px; padding: 0px; overflow: none; background-color: #ffffff;">
+          <epc:pin name="canvas" />
+          <noscript>
+            <p>JavaScript is required to view the contents of this page.</p>
+          </noscript>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      jQuery( window ).resize(function() {
+        getConWheelCanvasSize();
+      });
+    </script>
+  </epp:phrase>
+  
+  <epp:phrase id="Plugin/Screen/Collaborations/View:help">
+    <div class="ep_sr_help ep_no_js" id="collaborations_help">
+      <div id="collaborations_help_inner">
+        <p>Collaborations of an author are visualised on a wheel.
+          You can explore them using the mouse and the keyboard.<br/>
+          Mouse:
+          <ul>
+            <li>left click: 1st click select node, 2nd click rotate node to active position</li>
+            <li>right click: unselect node</li>
+            <li>click on publication count: gets publications of the author on the active position</li>
+            <li>click on node beneath publication count: goes to collaboration visualisation of the author on the active position</li>  
+          </ul>
+          Keys:
+          <ul>
+            <li>0 : reset wheel rotatation</li>
+            <li>Cursor →↓ : rotate anti-clockwise</li>
+            <li>Cursor ←↑ : rotate clockwise</li>
+            <li>a-z : jump to letter</li>
+            <li>+ : increase curvature</li>
+            <li>- : decrease curvature</li>
+            <li>= : default curvature</li>
+          </ul>
+        </p>
+      </div>
+    </div>
+  </epp:phrase>
+
+  <!-- link title for authors view -->
+  <epp:phrase id="Plugin/Screen/Collaborations/View:link_title">Coauthors</epp:phrase>
+  
+</epp:phrases>

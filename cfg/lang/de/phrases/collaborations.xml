@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE phrases SYSTEM "entities.dtd">
+
+<epp:phrases xmlns="http://www.w3.org/1999/xhtml" xmlns:epp="http://eprints.org/ep3/phrase" xmlns:epc="http://eprints.org/ep3/control">
+
+  <epp:phrase id="Plugin/Screen/Collaborations/View:title">Autoren-Netzwerk</epp:phrase>
+  <epp:phrase id="Plugin/Screen/Collaborations/View:missing_author">Es wurde kein Autorenname angegeben. Die CGI-URL muss mit dem Parameter author=Autorenname ergänzt werden.</epp:phrase>
+  <epp:phrase id="Plugin/Screen/Collaborations/View:missing_authordata">Keine Daten für den Autor <epc:pin name="author" /> vorhanden. Die Daten werden jeweils über Nacht nach dem Freischalten des Dokuments erzeugt.</epp:phrase>
+  <epp:phrase id="Plugin/Screen/Collaborations/View:no_canvas_support">Ihr Browser unterstützt das canvas Element nicht.</epp:phrase>
+
+  <epp:phrase id="Plugin/Screen/Collaborations/View:page_template">
+    <div id="cw_body" class="panel-body">
+      <!--[if lt IE 9]>
+        <script type="text/javascript">alert("Ihr Browser unterstützt das canvas Element nicht.");</script>
+      <![endif]-->
+      <script type="text/javascript">
+        // convenience function to get the id attribute of generated sketch html element
+        function getProcessingSketchId () { return 'ConWheel'; }
+      </script>
+      <div class="panel panel-default panel-uzh-fp">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            <a href="#">Koautoren für <epc:pin name="author_name"/></a>
+            <span class="ep_only_js ep_only_js_collaborations">
+              <div class="ep_sr_show_help ep_toggle" id="collaborations_help_show">
+                <a onclick="EPJS_blur(event); EPJS_toggleSlide('collaborations_help',false);EPJS_toggle('collaborations_help_hide',false);EPJS_toggle('collaborations_help_show',true);return false" href="#">
+                  <span class="glyphicon glyphicon-question-sign collaborations_glyphicon" />
+                </a>
+              </div>
+              <div class="ep_sr_hide_help ep_toggle ep_hide" id="collaborations_help_hide">
+                <a onclick="EPJS_blur(event); EPJS_toggleSlide('collaborations_help',false);EPJS_toggle('collaborations_help_hide',false);EPJS_toggle('collaborations_help_show',true);return false" href="#">
+                  <span class="glyphicon glyphicon-minus-sign collaborations_glyphicon" />
+                </a>
+              </div>
+            </span>
+          </h3>
+        </div>
+        <epc:pin name="help" />
+        <div id="content_cw" style="margin: 0px auto 0px auto; width: 400px; padding: 0px; overflow: none; background-color: #ffffff;">
+	  <epc:pin name="canvas" />
+          <noscript>
+            <p>JavaScript muss aktiviert sein, um den Inhalt dieser Seite anzuzeigen.</p>
+          </noscript>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      jQuery( window ).resize(function() {
+        getConWheelCanvasSize();
+      });
+    </script>
+  </epp:phrase>  
+  
+  <epp:phrase id="Plugin/Screen/Collaborations/View:help">
+    <div class="ep_sr_help ep_no_js" id="collaborations_help">
+      <div id="collaborations_help_inner">
+        <p>Das Autoren-Netzwerk visualisiert die Zusammenarbeit eines Autors mit seinen Co-Autoren auf einem Rad. 
+          Mit Maus und Tastatur können Sie das Netzwerk explorieren.<br/>
+          Mausklicks:
+          <ul>
+            <li>linke Taste: 1. Klick Knoten wählen, 2. Klick Knoten auf aktive Position drehen</li>
+            <li>rechte Taste: Auswahl rückgängig</li>
+            <li>Klick auf Zahl: ruft Publikationen des Autors der aktiven Position auf</li>
+            <li>Klick auf Knoten neben Zahl: geht zum Autoren-Netzwerk des Autors auf der aktiven Position</li>  
+          </ul>
+          Tasten:
+          <ul>
+            <li>0 : Rad auf Ursprungsposition zurücksetzen</li>
+            <li>Cursor →↓ : im Uhrzeigersinn drehen</li>
+            <li>Cursor ←↑ : im Gegenuhrzeigersinn drehen</li>
+            <li>a-z : zum Anfangsbuchstaben springen</li>
+            <li>+ : Krümmung erhöhen</li>
+            <li>- : Krümmung verkleinern</li>
+            <li>= : default-Krümmung</li>
+          </ul>
+        </p>
+      </div>
+    </div>
+  </epp:phrase>
+
+  <!-- link title for authors view -->
+  <epp:phrase id="Plugin/Screen/Collaborations/View:link_title">Koautoren</epp:phrase>
+  
+</epp:phrases>
