@@ -1,0 +1,4 @@
+*.pl linguist-language=Perl
+*.pm linguist-language=Perl
+*.js linguist-language=JavaScript
+*.pde linguist-language=Processing
