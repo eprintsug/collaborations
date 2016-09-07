@@ -18,30 +18,21 @@ The detailed format and description of the files is described in module conwheel
 Their XML schemas are available in the directory xml_schemas.
 
 
-Commands to control the wheel:
+##Commands to control the wheel:
 
 Mouse:
 
-left click: 1st click select node, 2nd click rotate node to active position
-
-right click: unselect node
-
-click on publication count: gets publications of the author on the active position
-
-click on node beneath publication count: goes to collaboration visualisation of the author on the active position
+* left click: 1st click select node, 2nd click rotate node to active position
+* right click: unselect node
+* click on publication count: gets publications of the author on the active position
+* click on node beneath publication count: goes to collaboration visualisation of the author on the active position
 
 Keys:
 
-0 : reset wheel rotatation
-
-Cursor →↓ : rotate anti-clockwise
-
-Cursor ←↑ : rotate clockwise
-
-a-z : jump to letter
-
-+ : increase curvature
-
-- : decrease curvature
-
-= : default curvature
+* 0 : reset wheel rotatation
+* Cursor →↓ : rotate anti-clockwise
+* Cursor ←↑ : rotate clockwise
+* a-z : jump to letter
+* + : increase curvature
+* - : decrease curvature
+* = : default curvature
