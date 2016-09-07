@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <callback>
+    <node_url>/cgi/collaborations/view?author=</node_url>
+    <items_url>/cgi/search/archive/advanced?screen=Search&amp;dataset=archive&amp;_action_search=Search&amp;creators_name%2Feditors_name=</items_url>
+  </callback>
+  <wheel>
+    <acceleration>0.05</acceleration>
+    <velocity>5</velocity>
+  </wheel>
+  <node>
+    <font name="Verdana" size="11"/>
+    <anchor_diameter>4</anchor_diameter>
+    <anchor_name_distance>20</anchor_name_distance>
+    <colors>
+      <normal>FF72AFE3</normal>
+      <active>FFF00F29</active>
+      <hover>FF358BD3</hover>
+      <select>FFB635D3</select>
+    </colors>
+  </node>
+  <edge>
+    <line_weight>
+      <normal>0.8</normal>
+      <hover>1.2</hover>
+      <select>1.2</select>
+    </line_weight>
+    <colors>
+      <normal>FFE0E0E0</normal>
+    </colors>
+    <curvature>140.0</curvature>
+  </edge>
+  <version>
+    <font name="Verdana" size="9" color="FFC0C0C0"/>
+  </version>
+</configuration>

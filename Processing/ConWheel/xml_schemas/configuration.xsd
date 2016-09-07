@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="configuration">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="callback"/>
+        <xs:element ref="wheel"/>
+        <xs:element ref="node"/>
+        <xs:element ref="edge"/>
+        <xs:element ref="version"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="callback">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="node_url"/>
+        <xs:element ref="items_url"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="node_url" type="xs:string"/>
+  <xs:element name="items_url" type="xs:string"/>
+  <xs:element name="wheel">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="acceleration"/>
+        <xs:element ref="velocity"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="acceleration" type="xs:decimal"/>
+  <xs:element name="velocity" type="xs:integer"/>
+  <xs:element name="node">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="font">
+          <xs:sequence>
+            <xs:element ref="anchor_diameter"/>
+            <xs:element ref="anchor_name_distance"/>
+            <xs:element ref="colors"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="anchor_diameter" type="xs:integer"/>
+  <xs:element name="anchor_name_distance" type="xs:integer"/>
+  <xs:element name="edge">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="line_weight"/>
+        <xs:element ref="colors"/>
+        <xs:element ref="curvature"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="line_weight">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="normal"/>
+        <xs:element ref="hover"/>
+        <xs:element ref="select"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="curvature" type="xs:decimal"/>
+  <xs:element name="version" type="font"/>
+  <xs:complexType name="font">
+    <xs:sequence>
+      <xs:element ref="font"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="font">
+    <xs:complexType>
+      <xs:attribute name="color" type="xs:NCName"/>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+      <xs:attribute name="size" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="colors">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="normal"/>
+        <xs:sequence minOccurs="0">
+          <xs:element ref="active"/>
+          <xs:element ref="hover"/>
+          <xs:element ref="select"/>
+        </xs:sequence>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="active" type="xs:NCName"/>
+  <xs:element name="normal" type="xs:NMTOKEN"/>
+  <xs:element name="hover" type="xs:NMTOKEN"/>
+  <xs:element name="select" type="xs:NMTOKEN"/>
+</xs:schema>

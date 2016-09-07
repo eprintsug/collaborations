@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="graph">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="nodes"/>
+        <xs:element ref="edges"/>
+        <xs:element ref="active_node"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="nodes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="n"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="n">
+    <xs:complexType>
+      <xs:attribute name="a" use="required"/>
+      <xs:attribute name="c" use="required" type="xs:integer"/>
+      <xs:attribute name="id" use="required" type="xs:integer"/>
+      <xs:attribute name="t" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="edges">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="e"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="e">
+    <xs:complexType>
+      <xs:attribute name="f" use="required" type="xs:integer"/>
+      <xs:attribute name="id" use="required" type="xs:integer"/>
+      <xs:attribute name="r" use="required" type="xs:integer"/>
+      <xs:attribute name="t" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="active_node">
+    <xs:complexType>
+      <xs:attribute name="r" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
