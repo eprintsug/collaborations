@@ -63,7 +63,7 @@ $c->{collaboration_fields} = [
 part to the field names that are used in your repository.
 
 
-#Edit your views.pl file
+###Edit your views.pl file
 
 In your cfg.d/views.pl file, find the configuration that is used to for generation and 
 display of the Browse Authors view.
@@ -240,7 +240,7 @@ The required space grows about quadratically with author count due to the edges 
 the authors. About 4 GB are required for 100'000 authors.
 
 
-`sudo -u apache ./generate_collaborations --help` display all the options for this command.
+`sudo -u apache {eprints_root}/archives/{repo}/bin/generate_collaborations --help` lists all options.
 
 
 ##Generating the author view
