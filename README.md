@@ -1,4 +1,4 @@
-# collaborations
+#Collaborations
 ##Visualisation of author collaborations
 
 The collaborations package analyses the author collaborations in an EPrints repository 
@@ -49,7 +49,7 @@ Copy the content of the cgi directory to the  {eprints_root}/cgi directory.
 
 ##Configuration
 
-#Edit the z_collaborations.pl file
+###Edit the z_collaborations.pl file
 
 In your cfg.d/z_collaborations.pl file, you need to adapt the 
 
@@ -102,7 +102,7 @@ E.g. for the view "authorsnew":
 
 ```
 
-#Edit the look of your visualisation
+###Edit the look of your visualisation
 
 You can configure the look of your visualisation (color, fonts, line widths) in 
 archives/zora/cfg/static/coauthors/configuration.xml:
@@ -173,7 +173,7 @@ ConWheel Processing code calculates from this a relative curvature that is used 
 graph is resized in a responsive GUI.
 
 
-#Restart the web server
+###Restart the web server
 
 After you have edited the configuration files, restart the web server.
 
@@ -197,7 +197,7 @@ https://github.com/eprintsug/collaborations/blob/master/Processing/ConWheel/conw
 https://github.com/eprintsug/collaborations/tree/master/Processing/ConWheel/xml_schemas )
 
 
-#Linking the coauthor_data directory
+###Linking the coauthor_data directory
 
 The coauthor_data directory must be linked to all your language-specific HTML collaboration
 directories so that the data can be accessed by the Processing code. Do the following:
@@ -209,7 +209,7 @@ ln -s {eprints_root}/archives/{repo}/html/coautor_data data
 
 Repeat these commands for every language, e.g. en, de, and so on.
 
-#Initial test
+###Initial test
 
 Inspect the `archives/{archive}/html/coauthor_data` directory and choose one of the author
 names saved there.
@@ -257,7 +257,7 @@ The author views should contain beside each author name a "Coauthors" link that 
 the respective collaboration graph.
 
 
-#Running updates
+##Running updates
 
 There are two options in for running updates with the generate_collaborations script:
 
