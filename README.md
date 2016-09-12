@@ -105,7 +105,7 @@ E.g. for the view "authorsnew":
 ###Edit the look of your visualisation
 
 You can configure the look of your visualisation (color, fonts, line widths) in 
-archives/zora/cfg/static/coauthors/configuration.xml:
+archives/{archive}/cfg/static/coauthors/configuration.xml:
 
 ```XML
 <?xml version="1.0" encoding="UTF-8"?>
