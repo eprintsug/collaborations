@@ -36,7 +36,7 @@
           </h3>
         </div>
         <epc:pin name="help" />
-        <div id="content_cw" style="margin: 0px auto 0px auto; width: 400px; padding: 0px; overflow: none; background-color: #ffffff;">
+        <div id="content_cw">
 	  <epc:pin name="canvas" />
           <noscript>
             <p>JavaScript muss aktiviert sein, um den Inhalt dieser Seite anzuzeigen.</p>
