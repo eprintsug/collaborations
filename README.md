@@ -172,6 +172,9 @@ in pixels. This value is relative to an initial graph size of 800 px x 800 px - 
 ConWheel Processing code calculates from this a relative curvature that is used when the 
 graph is resized in a responsive GUI.
 
+The detailed format (including XML Schemas) is described in 
+[conwheel_io.pde](https://github.com/eprintsug/collaborations/blob/master/Processing/ConWheel/conwheel_io.pde)
+
 
 ###Restart the web server
 
