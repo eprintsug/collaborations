@@ -65,7 +65,7 @@ use warnings;
 
 use utf8;
 use Digest::MD5 qw(md5_hex);
-use Data::Dumper;
+use XML::LibXML;
 
 use base 'EPrints::Plugin';
 
@@ -394,37 +394,53 @@ sub write_graph_data
 
 	my $target = $dir . "/" . EPrints::Utils::escape_filename( $author_name ) . ".xml";
 	
-	open my $xmlout, ">", $target or die "Cannot open > $target\n";
+	my $xmldoc = XML::LibXML::Document->new('1.0','utf-8');
 		
-	print $xmlout '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-	print $xmlout '<graph>' . "\n";
-	print $xmlout '<nodes>' . "\n";
+	my $element_graph = $xmldoc->createElement( "graph" );
+	my $element_nodes = $xmldoc->createElement( "nodes" );
+	$element_graph->appendChild( $element_nodes );
+
 	foreach my $author_id (keys %{$graph->{graph}->{nodes}})
 	{
 		my $name = $graph->{graph}->{nodes}->{$author_id}->{complete_name};
 		my $item_count = $graph->{graph}->{nodes}->{$author_id}->{item_count};
 		my $link = $graph->{graph}->{nodes}->{$author_id}->{link};
-			
-		print $xmlout '<n id="' . $author_id . '" t="' . $name . '" c="' . $item_count . '" a="' . $link . '"/>' . "\n";
-	}
-	print $xmlout '</nodes>' . "\n";
 		
-	print $xmlout '<edges>' . "\n";
+		my $element_node = $xmldoc->createElement( "n" );
+		$element_node->setAttribute( "id", $author_id );
+		$element_node->setAttribute( "t", $name );
+		$element_node->setAttribute( "c", $item_count );
+		$element_node->setAttribute( "a", $link );
+		$element_nodes->appendChild( $element_node );
+	}
+	
+	my $element_edges = $xmldoc->createElement( "edges" );
+	$element_graph->appendChild( $element_edges );
+	
 	foreach my $edge_id (keys %{$graph->{graph}->{edges}})
 	{
 		my $from = $graph->{graph}->{edges}->{$edge_id}->{from};
  		my $to = $graph->{graph}->{edges}->{$edge_id}->{to};
 		my $ref = $graph->{graph}->{edges}->{$edge_id}->{ref};
-	
-		print $xmlout '<e id="' . $edge_id . '" f="' . $from . '" t="' . $to .  '" r="' . $ref . '"/>' . "\n";
-	}
 		
-	print $xmlout '</edges>' . "\n";
+		my $element_edge = $xmldoc->createElement( "e" );
+		$element_edge->setAttribute( "id", $edge_id );
+		$element_edge->setAttribute( "f", $from );
+		$element_edge->setAttribute( "t", $to );
+		$element_edge->setAttribute( "r", $ref );
+		$element_edges->appendChild( $element_edge );
+	}
 	
-	print $xmlout '<active_node r="' . $graph->{graph}->{active_node} . '"/>' . "\n";
-	print $xmlout '</graph>' . "\n";
+	my $element_active_node = $xmldoc->createElement( "active_node" );
+	$element_active_node->setAttribute( "r", $graph->{graph}->{active_node} );
+	$element_graph->appendChild( $element_active_node );
+	
+	$xmldoc->setDocumentElement( $element_graph );
+	my $xmldoc_string = $xmldoc->toString(1);
+	
+	open my $xmlout, ">", $target or die "Cannot open > $target\n";
+	print $xmlout $xmldoc_string;
 	close $xmlout;
-	
 	return;
 }
 
@@ -453,12 +469,12 @@ sub save_author_list
 
 	my $target = $dir . "/author_list.xml";
 	
-	open my $xmlout, ">", $target or die "Cannot open > $target\n";
-		
-	print $xmlout '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+	my $xmldoc = XML::LibXML::Document->new('1.0','utf-8');
 	
 	my $count = scalar keys %$author_list;
-	print $xmlout '<authors count="' . $count . '">' . "\n";
+	
+	my $element_authors = $xmldoc->createElement( "authors" );
+	$element_authors->setAttribute( "count", $count );
 	
 	foreach my $author_key (sort { $author_list->{$a}->{complete_name} cmp $author_list->{$b}->{complete_name} } keys %$author_list)
 	{
@@ -468,11 +484,21 @@ sub save_author_list
 		my $given = $author_list->{$author_key}->{given};
 		my $item_count = $author_list->{$author_key}->{item_count};
 		
-		print $xmlout '<author id="' . $id . '" name="' . $name . '" family="' . $family . '" given="' . $given . 
-			'" md5="' . $author_key . '" items="' . $item_count . '" />' . "\n";
+		my $element_author = $xmldoc->createElement( "author" );
+		$element_author->setAttribute( "id", $id );
+		$element_author->setAttribute( "name", $name );
+		$element_author->setAttribute( "family", $family );
+		$element_author->setAttribute( "given", $given );
+		$element_author->setAttribute( "md5", $author_key );
+		$element_author->setAttribute( "items", $item_count );
+		$element_authors->appendChild( $element_author );
 	}
 	
-	print $xmlout '</authors>' . "\n";
+	$xmldoc->setDocumentElement( $element_authors );
+	my $xmldoc_string = $xmldoc->toString(1);
+	
+	open my $xmlout, ">", $target or die "Cannot open > $target\n";
+	print $xmlout $xmldoc_string;
 	close $xmlout;
 	
 	return;
