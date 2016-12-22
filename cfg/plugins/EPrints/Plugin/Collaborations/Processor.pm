@@ -263,11 +263,16 @@ sub create_coauthor_graph
 	utf8::decode($author_given);
 		
 	$author_given =~ s/\s/\./g;
-		
+	
+	if ($author_family =~ /'/ && $author_family !~ /\s/)
+	{
+		$author_family = '"' . $author_family . '"';
+	}
+	
 	my $author_name = $author_family;
 	$author_name = $author_name . ', ' . $author_given if ($author_given ne '');
-	
-	if ($author_family =~ /\s/ )
+			
+	if ($author_family =~ /\s/)
 	{
 		$author_name = '"' . $author_name . '"';
 	}
