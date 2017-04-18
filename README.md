@@ -1,5 +1,5 @@
-#Collaborations
-##Visualisation of author collaborations
+# Collaborations
+## Visualisation of author collaborations
 
 The collaborations package analyses the author collaborations in an EPrints repository 
 and visualises them on an interactive wheel. The author collaboration network graphs are 
@@ -19,12 +19,12 @@ The package consists of
 For a demo, see e.g. http://www.zora.uzh.ch/cgi/collaborations/view?author=Gloor%20C
 
 
-##Requirements
+## Requirements
 
 JQuery is required for scaling the visualisation canvas.
 
 
-##General setup
+## General setup
 
 The setup procedure consists of the following steps
 
@@ -38,7 +38,7 @@ The setup procedure consists of the following steps
 - Running updates
 
 
-##Installation
+## Installation
 
 Copy the content of the bin and cfg directories to the respective 
 {eprints_root}/archives/{yourarchive}/bin and {eprints_root}/archives/{yourarchive}/cfg 
@@ -47,9 +47,9 @@ directories.
 Copy the content of the cgi directory to the  {eprints_root}/cgi directory.
 
 
-##Configuration
+## Configuration
 
-###Edit the z_collaborations.pl file
+### Edit the z_collaborations.pl file
 
 In your cfg.d/z_collaborations.pl file, you need to adapt the 
 
@@ -63,7 +63,7 @@ $c->{collaboration_fields} = [
 part to the field names that are used in your repository.
 
 
-###Edit your views.pl file
+### Edit your views.pl file
 
 In your cfg.d/views.pl file, find the configuration that is used to for generation and 
 display of the Browse Authors view.
@@ -102,7 +102,7 @@ E.g. for the view "authorsnew":
 
 ```
 
-###Edit the look of your visualisation
+### Edit the look of your visualisation
 
 You can configure the look of your visualisation (color, fonts, line widths) in 
 archives/{archive}/cfg/static/coauthors/configuration.xml:
@@ -176,12 +176,12 @@ The detailed format (including XML Schemas) is described in
 [conwheel_io.pde](https://github.com/eprintsug/collaborations/blob/master/Processing/ConWheel/conwheel_io.pde)
 
 
-###Restart the web server
+### Restart the web server
 
 After you have edited the configuration files, restart the web server.
 
 
-##Initial generation of coauthor data
+## Initial generation of coauthor data
 
 To initialize and test your setup, create coauthor graphs for one (1) eprint:
 
@@ -200,7 +200,7 @@ https://github.com/eprintsug/collaborations/blob/master/Processing/ConWheel/conw
 https://github.com/eprintsug/collaborations/tree/master/Processing/ConWheel/xml_schemas )
 
 
-###Linking the coauthor_data directory
+### Linking the coauthor_data directory
 
 The coauthor_data directory must be linked to all your language-specific HTML collaboration
 directories so that the data can be accessed by the Processing code. Do the following:
@@ -212,7 +212,7 @@ ln -s {eprints_root}/archives/{repo}/html/coautor_data data
 
 Repeat these commands for every language, e.g. en, de, and so on.
 
-###Initial test
+### Initial test
 
 Inspect the `archives/{archive}/html/coauthor_data` directory and choose one of the author
 names saved there.
@@ -228,7 +228,7 @@ left to the name to check whether the advanced search of the publications does w
 Edit the look of your visualisation).
 
 
-##Generating the author collaborations: The generate_collaborations script
+## Generating the author collaborations: The generate_collaborations script
 
 Now a full run to generate the author collaborations must be carried out:
 
@@ -246,7 +246,7 @@ the authors. About 4 GB are required for 100'000 authors.
 `sudo -u apache {eprints_root}/archives/{repo}/bin/generate_collaborations --help` lists all options.
 
 
-##Generating the author view
+## Generating the author view
 
 Recreate the author browse view using
 
@@ -260,7 +260,7 @@ The author views should contain beside each author name a "Coauthors" link that 
 the respective collaboration graph.
 
 
-##Running updates
+## Running updates
 
 There are two options in for running updates with the generate_collaborations script:
 
@@ -290,7 +290,7 @@ In other words: Only a next-neighbor search will carried out in the collaboratio
 of the authors in the new eprints.
 
 
-##Editing the Processing code (for developers)
+## Editing the Processing code (for developers)
 
 The ConWheel.pde file being used in the EPrints repo can be found in cfg/static/coauthors 
 and can be used as is.
